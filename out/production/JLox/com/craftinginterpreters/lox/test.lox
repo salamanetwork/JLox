@@ -1,0 +1,12 @@
+var x = 10.6;
+fun sum(a, b) {
+    return a + b;
+}
+
+if(x >= 10) {
+    sum(5, 5);
+} else if (x <= 10) {
+    sum(2, 2);
+} else {
+    sum(0.0, 0.0);
+}

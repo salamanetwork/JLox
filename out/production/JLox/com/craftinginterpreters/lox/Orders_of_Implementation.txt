@@ -1,0 +1,99 @@
+0001) class Lox:
+    Fields:
+        private static boolean hadError = false;                            // We’ll use this to ensure we don’t try to execute code that has a known error.
+
+    Methods:
+        public static void main(String[] args) throws IOException;
+
+        private static void runFile(String path) throws IOException;        // Run Direct Script File.
+
+        private static void runPrompt() throws IOException;                 // REPL - Read, Evaluate, Print and Loop.
+
+        private static void run(String source);                             // Run the actual source code
+
+        public static void error(int line, String message);                 // Handling Error
+
+        private static void report(int line, String where, String message); // Reporting Error
+
+0002) enum TokenType:
+    // Single-character tokens:
+    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+
+    // One or two character tokens:
+    BANG, BANG_EQUAL,
+    EQUAL, EQUAL_EQUAL,
+    GREATER, GREATER_EQUAL,
+    LESS, LESS_EQUAL,
+
+    // Literals:
+    DENTIFIER, STRING, NUMBER,
+
+    // Keywords:
+    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    EOF
+
+0003) class Token:
+    Fields:
+        final TokenType type;               // Token Type
+
+        final String lexeme;                // Store the Lexeme
+
+        final Object literal;               // Store the actual value that represents the lexeme (number, string, boolean, ...)
+
+        final int line;                     // Store the location Information
+
+    Methods:
+        Token(TokenType type, String lexeme, Object literal, int line);
+
+        public String toString();           // To print out the current token
+
+0004) class Scanner:
+    Fields:
+        private final String source;                            // Holding The  Source String
+
+        private final List<Token> tokens = new ArrayList<>();   // Holding the tokens' list
+
+        private int start = 0;                                  // Points to the first character in the lexeme being scanned
+
+        private int current = 0;                                // Points at the character currently being considered
+
+        private int line = 1;                                   // Points to How many lines as a counter increased by '\n' when it is found.
+
+        private static final Map<String, TokenType> keywords;   // To get identifiers working: We define the set of reserved words in a map.
+
+    Methods:
+        Scanner(String source);
+        public List<Token> scanTokens();                        // The aforementioned loop that going to generate that tokens
+
+        private void scanToken();                               // In each turn of the loop, we scan a single token. This is the real heart of the scanner.
+
+        private void identifier();                              // Handling Reserved Words and Identifiers:
+
+        private void number();                                  // Handling Number literals lexeme:
+
+        private void string();                                  // Handling string literal lexeme:
+
+        private char advance();                                 // The advance() method consumes the next character in the source file and returns it.
+
+        private boolean match(char expected);                   // It’s like a conditional advance().
+
+        private char peek();                                    // The peek() method: It’s sort of like advance(), but doesn’t consume the character.
+
+        private char peekNext();                                //  It’s sort of like peek(), but check the character after you peek a lookahead peek().
+
+        private boolean isAlpha(char c);                        // The isAlpha() method: to look for any alphabets.
+
+        private boolean isAlphaNumeric(char c);                 // The isAlphaNumeric() method: to check if the character 'c' is Alphabetic Or Numeric
+
+        private boolean isDigit(char c);                        // The isDigit() method: to look for any digit.
+
+        private void addToken(TokenType type);                  // Where advance() is for input, addToken() is for output.
+
+        private void addToken(TokenType type, Object literal);  // We’ll use this as overloaded to handle tokens with literal values soon.
+
+        private boolean isAtEnd();                              // Helper function that tells us if we’ve consumed all the characters.
+
+
+
