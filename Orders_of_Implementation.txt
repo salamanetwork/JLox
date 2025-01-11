@@ -1,99 +1,150 @@
-0001) class Lox:
-    Fields:
-        private static boolean hadError = false;                            // We’ll use this to ensure we don’t try to execute code that has a known error.
+(0001) class Lox:
+Fields:
+    private static boolean hadError = false;                            // We’ll use this to ensure we don’t try to execute code that has a known error.
 
-    Methods:
-        public static void main(String[] args) throws IOException;
+Methods:
+    public static void main(String[] args) throws IOException;
 
-        private static void runFile(String path) throws IOException;        // Run Direct Script File.
+    private static void runFile(String path) throws IOException;        // Run Direct Script File.
 
-        private static void runPrompt() throws IOException;                 // REPL - Read, Evaluate, Print and Loop.
+    private static void runPrompt() throws IOException;                 // REPL - Read, Evaluate, Print and Loop.
 
-        private static void run(String source);                             // Run the actual source code
+    private static void run(String source);                             // Run the actual source code
 
-        public static void error(int line, String message);                 // Handling Error
+    public static void error(int line, String message);                 // Handling Error
 
-        private static void report(int line, String where, String message); // Reporting Error
+    private static void report(int line, String where, String message); // Reporting Error
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+(0002) enum TokenType:
+// Single-character tokens:
+LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 
-0002) enum TokenType:
-    // Single-character tokens:
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+// One or two character tokens:
+BANG, BANG_EQUAL,
+EQUAL, EQUAL_EQUAL,
+GREATER, GREATER_EQUAL,
+LESS, LESS_EQUAL,
 
-    // One or two character tokens:
-    BANG, BANG_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+// Literals:
+IDENTIFIER, STRING, NUMBER,
 
-    // Literals:
-    DENTIFIER, STRING, NUMBER,
+// Keywords:
+AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+EOF
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+(0003) class Token:
+Fields:
+    final TokenType type;               // Token Type
 
-    // Keywords:
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
-    EOF
+    final String lexeme;                // Store the Lexeme
 
-0003) class Token:
-    Fields:
-        final TokenType type;               // Token Type
+    final Object literal;               // Store the actual value that represents the lexeme (number, string, boolean, ...)
 
-        final String lexeme;                // Store the Lexeme
+    final int line;                     // Store the location Information
 
-        final Object literal;               // Store the actual value that represents the lexeme (number, string, boolean, ...)
+Methods:
+    Token(TokenType type, String lexeme, Object literal, int line);
 
-        final int line;                     // Store the location Information
+    public String toString();           // To print out the current token
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+(0004) class Scanner:
+Fields:
+    private final String source;                            // Holding The  Source String
 
-    Methods:
-        Token(TokenType type, String lexeme, Object literal, int line);
+    private final List<Token> tokens = new ArrayList<>();   // Holding the tokens' list
 
-        public String toString();           // To print out the current token
+    private int start = 0;                                  // Points to the first character in the lexeme being scanned
 
-0004) class Scanner:
-    Fields:
-        private final String source;                            // Holding The  Source String
+    private int current = 0;                                // Points at the character currently being considered
 
-        private final List<Token> tokens = new ArrayList<>();   // Holding the tokens' list
+    private int line = 1;                                   // Points to How many lines as a counter increased by '\n' when it is found.
 
-        private int start = 0;                                  // Points to the first character in the lexeme being scanned
+    private static final Map<String, TokenType> keywords;   // To get identifiers working: We define the set of reserved words in a map.
 
-        private int current = 0;                                // Points at the character currently being considered
+Methods:
+    Scanner(String source);
+    public List<Token> scanTokens();                        // The aforementioned loop that going to generate that tokens
 
-        private int line = 1;                                   // Points to How many lines as a counter increased by '\n' when it is found.
+    private void scanToken();                               // In each turn of the loop, we scan a single token. This is the real heart of the scanner.
 
-        private static final Map<String, TokenType> keywords;   // To get identifiers working: We define the set of reserved words in a map.
+    private void identifier();                              // Handling Reserved Words and Identifiers:
 
-    Methods:
-        Scanner(String source);
-        public List<Token> scanTokens();                        // The aforementioned loop that going to generate that tokens
+    private void number();                                  // Handling Number literals lexeme:
 
-        private void scanToken();                               // In each turn of the loop, we scan a single token. This is the real heart of the scanner.
+    private void string();                                  // Handling string literal lexeme:
 
-        private void identifier();                              // Handling Reserved Words and Identifiers:
+    private char advance();                                 // The advance() method consumes the next character in the source file and returns it.
 
-        private void number();                                  // Handling Number literals lexeme:
+    private boolean match(char expected);                   // It’s like a conditional advance().
 
-        private void string();                                  // Handling string literal lexeme:
+    private char peek();                                    // The peek() method: It’s sort of like advance(), but doesn’t consume the character.
 
-        private char advance();                                 // The advance() method consumes the next character in the source file and returns it.
+    private char peekNext();                                //  It’s sort of like peek(), but check the character after you peek a lookahead peek().
 
-        private boolean match(char expected);                   // It’s like a conditional advance().
+    private boolean isAlpha(char c);                        // The isAlpha() method: to look for any alphabets.
 
-        private char peek();                                    // The peek() method: It’s sort of like advance(), but doesn’t consume the character.
+    private boolean isAlphaNumeric(char c);                 // The isAlphaNumeric() method: to check if the character 'c' is Alphabetic Or Numeric
 
-        private char peekNext();                                //  It’s sort of like peek(), but check the character after you peek a lookahead peek().
+    private boolean isDigit(char c);                        // The isDigit() method: to look for any digit.
 
-        private boolean isAlpha(char c);                        // The isAlpha() method: to look for any alphabets.
+    private void addToken(TokenType type);                  // Where advance() is for input, addToken() is for output.
 
-        private boolean isAlphaNumeric(char c);                 // The isAlphaNumeric() method: to check if the character 'c' is Alphabetic Or Numeric
+    private void addToken(TokenType type, Object literal);  // We’ll use this as overloaded to handle tokens with literal values soon.
 
-        private boolean isDigit(char c);                        // The isDigit() method: to look for any digit.
+    private boolean isAtEnd();                              // Helper function that tells us if we’ve consumed all the characters.
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+Chapter 5:
 
-        private void addToken(TokenType type);                  // Where advance() is for input, addToken() is for output.
+    - context-free grammar *CFG*
+    - In our scanner’s grammar, the alphabet consists of individual characters and the strings are the valid lexemes—roughly “words”.
+    - In the syntactic grammar we’re talking about now, we’re at a different level of granularity.
+    - Now each “letter” in the alphabet is an entire token and a “string” is a sequence of tokens—an entire expression.
 
-        private void addToken(TokenType type, Object literal);  // We’ll use this as overloaded to handle tokens with literal values soon.
+    Terminology                         Lexical grammar         Syntactic grammar
+    ------------------------------------------------------------------------------
+    The “alphabet” is             →     Characters                 Tokens
+    A “string” is                 →     Lexeme or token            Expression
+    It’s implemented by the       →     Scanner                    Parser
 
-        private boolean isAtEnd();                              // Helper function that tells us if we’ve consumed all the characters.
+    - A formal grammar’s job is to specify which strings are valid and which aren’t.
+    - If we were defining a grammar for English sentences, “eggs are tasty for breakfast” would be in the grammar, but “tasty breakfast for are eggs” would probably not.
+
+    # Rules for grammars:
+        - If you start with the rules, you can use them to generate strings that are in the grammar.
+            - Strings created this way are called derivations because each is derived from the rules of the grammar.
+        - Rules are called productions because they produce strings in the grammar.
+            - Each production in a context-free grammar has a *head*—its name—and a body, which describes what it generates.
+            - In its pure form, the body is simply a list of symbols.
+            - Symbols come in two delectable flavors:
+                - A *terminal*:
+                    - is a letter from the grammar’s alphabet.
+                    - You can think of it like a literal value.
+                    - In the syntactic grammar we’re defining, the terminals are individual lexemes—tokens coming from the scanner like 'if' or '1234'.
+                    - You simply produce that one symbol.
+                - A *non-terminal*:
+                    - is a named reference to another rule in the grammar.
+                    - It means “play that rule and insert whatever it produces here”.
+                    - In this way, the grammar composes.
+        - There is one last refinement:
+            - you may have multiple rules with the same name.
+            - When you reach a non-terminal with that name, you are allowed to pick any of the rules for it, whichever floats your boat.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
