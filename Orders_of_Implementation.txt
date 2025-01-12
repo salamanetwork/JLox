@@ -131,6 +131,40 @@ Chapter 5:
             - you may have multiple rules with the same name.
             - When you reach a non-terminal with that name, you are allowed to pick any of the rules for it, whichever floats your boat.
 
+    # Enhancing our notation:
+        - In addition to terminals and non-terminals, we’ll allow a few other kinds of expressions in the body of a rule:
+            - Instead of repeating the rule name each time we want to add another production for it, we’ll allow a series of productions separated by a pipe (|).
+            - Further, we’ll allow parentheses '()' for grouping and then allow '|' within that to select one from a series of options within the middle of a production.
+            - So, we also use a postfix '*' to allow the previous symbol or group to be repeated zero or more times.
+            - A postfix '+' is similar, but requires the preceding production to appear at least once.
+            - A postfix '?' is for an optional production. The thing before it can appear zero or one time, but not more.
+
+    # A Grammar for Lox expressions:
+        - Literals. Numbers, strings, Booleans, and nil.
+        - Unary expressions. A prefix ! to perform a logical not, and - to negate a number.
+        - Binary expressions. The infix arithmetic (+, -, *, /) and logic operators (==, !=, <, <=, >, >=) we know and love.
+        - Parentheses. A pair of ( and ) wrapped around an expression.
+        - Primitive Lox's Grammar:
+
+            ------------------------------------------------------------------------------------------------------------
+            expression     → literal
+                           | unary
+                           | binary
+                           | grouping ;
+
+            literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+            grouping       → "(" expression ")" ;
+            unary          → ( "-" | "!" ) expression ;
+            binary         → expression operator expression ;
+            operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+                           | "+"  | "-"  | "*" | "/" ;
+            ------------------------------------------------------------------------------------------------------------
+
+            * In addition to quoted strings for terminals that match exact lexemes.
+            * We CAPITALIZE terminals that are a single lexeme whose text representation may vary.
+            * 'NUMBER' is any number literal.
+            * 'STRING' is any string literal.
+            * We’ll do the same for 'IDENTIFIER'.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
