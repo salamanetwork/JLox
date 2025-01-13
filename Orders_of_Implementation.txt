@@ -1,4 +1,5 @@
-(0001) class Lox:
+// **Lox.java**
+class Lox:
 Fields:
     private static boolean hadError = false;                            // We’ll use this to ensure we don’t try to execute code that has a known error.
 
@@ -15,7 +16,9 @@ Methods:
 
     private static void report(int line, String where, String message); // Reporting Error
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-(0002) enum TokenType:
+
+// **TokenType.java**
+enum TokenType:
 // Single-character tokens:
 LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
 COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
@@ -33,8 +36,10 @@ IDENTIFIER, STRING, NUMBER,
 AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
 PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 EOF
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-(0003) class Token:
+// **Token.java**
+class Token:
 Fields:
     final TokenType type;               // Token Type
 
@@ -48,8 +53,10 @@ Methods:
     Token(TokenType type, String lexeme, Object literal, int line);
 
     public String toString();           // To print out the current token
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-(0004) class Scanner:
+// **Scanner.java**
+class Scanner:
 Fields:
     private final String source;                            // Holding The  Source String
 
@@ -94,6 +101,7 @@ Methods:
     private void addToken(TokenType type, Object literal);  // We’ll use this as overloaded to handle tokens with literal values soon.
 
     private boolean isAtEnd();                              // Helper function that tells us if we’ve consumed all the characters.
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 Chapter 5:
 
@@ -165,6 +173,47 @@ Chapter 5:
             * 'NUMBER' is any number literal.
             * 'STRING' is any string literal.
             * We’ll do the same for 'IDENTIFIER'.
+
+    # Implementing Syntax Trees:
+        - That little expression grammar is our skeleton.
+        - Since the grammar is recursive, our data structure will form a tree.
+        - Since this structure represents the syntax of our language, it’s called a *syntax tree*.
+            - In particular, we’re defining an abstract syntax tree (AST).
+            - In a parse tree, every single grammar production becomes a node in the tree.
+            - An AST elides productions that aren’t needed by later phases.
+        - Our scanner used a single Token class to represent all kinds of lexemes.
+            - To distinguish the different kinds—think the number 123 versus the string "123"—we included a simple TokenType enum.
+            - Syntax trees are not so homogeneous.
+            - Unary expressions have a single operand, binary expressions have two, and literals have none.
+            - Tokens aren’t entirely homogeneous either.
+            - Tokens for literals store the value, but other kinds of lexemes don’t need that state.
+        - We’ll define a base class for expressions **Expr.java**.
+        - Then, for each kind of expression—each production under expression—we create a subclass that has fields for the non-terminals specific to that rule.
+        - This way, we get a compile error if we, say, try to access the second operand of a unary expression.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+// **Expr.java**
+abstract class Expr:
+Fields:
+
+Methods:
+
+
+// For Subclasses:
+    - Instead of tediously handwriting each class definition, field declaration, constructor, and initializer.
+    - We’ll hack together a script that does it for us.
+    - It has a description of each tree type—its name and fields—and it prints out the Java code needed to define a class with that name and state.
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
